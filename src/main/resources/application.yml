@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: ticketing
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ticketing
+    username: ticketing
+    password: ticketing
+
+  jpa:
+    hibernate:
+      ddl-auto: validate   # 表结构由 Flyway 管理，JPA 只做校验，绝不自动改表
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info   # 只暴露必要端点
+  endpoint:
+    health:
+      show-details: always     # 学习阶段显示 DB/Redis 各自健康状态
