@@ -1,0 +1,10 @@
+package com.example.ticketing.event.domain;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EventRepository extends JpaRepository<Event, Long> {
+    Page<Event> findByStatus(Event.Status status, Pageable pageable);
+    Page<Event> findByOrganizerId(Long organizerId, Pageable pageable);
+}
