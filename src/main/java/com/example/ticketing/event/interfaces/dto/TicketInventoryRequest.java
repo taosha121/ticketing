@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record TicketTypeRequest(
+public record TicketInventoryRequest(
         @NotBlank String name,
         @NotNull @DecimalMin("0.00") BigDecimal price,
         @Min(1) int totalQuantity

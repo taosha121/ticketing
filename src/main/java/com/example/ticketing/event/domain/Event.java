@@ -43,7 +43,7 @@ public class Event {
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TicketType> ticketTypes = new ArrayList<>();
+    private List<TicketInventory> ticketTypes = new ArrayList<>();
 
     protected Event() {}
 
@@ -84,7 +84,7 @@ public class Event {
     public Status getStatus() { return status; }
     public String getPosterUrl() { return posterUrl; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
-    public List<TicketType> getTicketTypes() { return ticketTypes; }
+    public List<TicketInventory> getTicketTypes() { return ticketTypes; }
 
     public enum Status { DRAFT, PUBLISHED, CANCELLED }
 }

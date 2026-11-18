@@ -14,5 +14,5 @@ public record CreateEventRequest(
         @NotBlank String venue,
         @NotNull OffsetDateTime startsAt,
         @NotNull OffsetDateTime endsAt,
-        @NotNull @Size(min = 1) @Valid List<TicketTypeRequest> ticketTypes
+        @NotNull @Size(min = 1) @Valid List<TicketInventoryRequest> ticketTypes
 ) {}

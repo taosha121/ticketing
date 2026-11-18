@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "ticket_types")
-public class TicketType {
+@Table(name = "ticket_inventories")
+public class TicketInventory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,14 +32,25 @@ public class TicketType {
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
-    protected TicketType() {}
+    protected TicketInventory() {}
 
-    public TicketType(Event event, String name, BigDecimal price, int totalQuantity) {
+    public TicketInventory(Event event, String name, BigDecimal price, int totalQuantity) {
         this.event = event;
         this.name = name;
         this.price = price;
         this.totalQuantity = totalQuantity;
         this.remainingQuantity = totalQuantity;
+    }
+
+    public void deduct(int quantity) {
+        if (remainingQuantity < quantity) {
+            throw new IllegalStateException("Insufficient inventory");
+        }
+        this.remainingQuantity -= quantity;
+    }
+
+    public void restore(int quantity) {
+        this.remainingQuantity += quantity;
     }
 
     public Long getId() { return id; }

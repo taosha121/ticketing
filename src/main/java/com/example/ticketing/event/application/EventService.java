@@ -3,7 +3,7 @@ package com.example.ticketing.event.application;
 import com.example.ticketing.auth.domain.UserRepository;
 import com.example.ticketing.event.domain.Event;
 import com.example.ticketing.event.domain.EventRepository;
-import com.example.ticketing.event.domain.TicketType;
+import com.example.ticketing.event.domain.TicketInventory;
 import com.example.ticketing.event.interfaces.dto.CreateEventRequest;
 import com.example.ticketing.event.interfaces.dto.EventResponse;
 import com.example.ticketing.event.interfaces.dto.UpdateEventRequest;
@@ -35,7 +35,7 @@ public class EventService {
                 req.venue(), req.startsAt(), req.endsAt());
 
         req.ticketTypes().forEach(tt ->
-                event.getTicketTypes().add(new TicketType(event, tt.name(), tt.price(), tt.totalQuantity()))
+                event.getTicketTypes().add(new TicketInventory(event, tt.name(), tt.price(), tt.totalQuantity()))
         );
 
         return EventResponse.from(eventRepository.save(event));
