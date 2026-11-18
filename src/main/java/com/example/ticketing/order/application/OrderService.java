@@ -10,6 +10,8 @@ import com.example.ticketing.order.domain.Reservation;
 import com.example.ticketing.order.domain.ReservationRepository;
 import com.example.ticketing.order.interfaces.dto.OrderResponse;
 import com.example.ticketing.order.interfaces.dto.PlaceOrderRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,8 @@ import java.time.OffsetDateTime;
 
 @Service
 public class OrderService {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository orderRepository;
     private final ReservationRepository reservationRepository;
@@ -80,5 +84,29 @@ public class OrderService {
         }
 
         return OrderResponse.from(order);
+    }
+
+    @Transactional
+    public void expireReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found: " + reservationId));
+
+        if (reservation.getStatus() != Reservation.Status.ACTIVE) {
+            return;
+        }
+
+        TicketInventory inventory = ticketInventoryRepository
+                .findByIdForUpdate(reservation.getTicketInventoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("TicketInventory not found: " + reservation.getTicketInventoryId()));
+
+        inventory.restore(reservation.getQuantity());
+        reservation.expire();
+
+        Order order = orderRepository.findById(reservation.getOrderId())
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + reservation.getOrderId()));
+        order.cancel();
+
+        log.info("Expired reservation={} order={} inventory={} qty={}",
+                reservationId, order.getId(), inventory.getId(), reservation.getQuantity());
     }
 }
