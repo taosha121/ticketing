@@ -9,11 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/events")
@@ -68,5 +70,14 @@ public class EventController {
             @AuthenticationPrincipal UserDetails user,
             @PathVariable Long id) {
         return eventService.cancel(user.getUsername(), id);
+    }
+
+    @PostMapping(value = "/{id}/poster", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ORGANIZER')")
+    public EventResponse uploadPoster(
+            @AuthenticationPrincipal UserDetails user,
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        return eventService.uploadPoster(user.getUsername(), id, file);
     }
 }

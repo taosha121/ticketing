@@ -74,6 +74,8 @@ public class Event {
         this.endsAt = endsAt;
     }
 
+    public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
+
     public Long getId() { return id; }
     public Long getOrganizerId() { return organizerId; }
     public String getTitle() { return title; }

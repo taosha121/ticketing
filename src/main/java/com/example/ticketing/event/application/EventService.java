@@ -1,28 +1,34 @@
 package com.example.ticketing.event.application;
 
 import com.example.ticketing.auth.domain.UserRepository;
+import com.example.ticketing.common.exception.ResourceNotFoundException;
+import com.example.ticketing.common.storage.StorageService;
 import com.example.ticketing.event.domain.Event;
 import com.example.ticketing.event.domain.EventRepository;
 import com.example.ticketing.event.domain.TicketInventory;
 import com.example.ticketing.event.interfaces.dto.CreateEventRequest;
 import com.example.ticketing.event.interfaces.dto.EventResponse;
 import com.example.ticketing.event.interfaces.dto.UpdateEventRequest;
-import com.example.ticketing.common.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class EventService {
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final StorageService storageService;
 
-    public EventService(EventRepository eventRepository, UserRepository userRepository) {
+    public EventService(EventRepository eventRepository,
+                        UserRepository userRepository,
+                        StorageService storageService) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.storageService = storageService;
     }
 
     @Transactional
@@ -72,6 +78,14 @@ public class EventService {
     public EventResponse cancel(String organizerEmail, Long id) {
         Event event = findOwnEvent(organizerEmail, id);
         event.cancel();
+        return EventResponse.from(eventRepository.save(event));
+    }
+
+    @Transactional
+    public EventResponse uploadPoster(String organizerEmail, Long id, MultipartFile file) {
+        Event event = findOwnEvent(organizerEmail, id);
+        String url = storageService.store(file);
+        event.setPosterUrl(url);
         return EventResponse.from(eventRepository.save(event));
     }
 
