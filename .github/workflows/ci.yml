@@ -22,3 +22,6 @@ jobs:
 
       - name: Run all tests
         run: mvn test --no-transfer-progress
+        env:
+          DOCKER_HOST: unix:///var/run/docker.sock
+          TESTCONTAINERS_RYUK_DISABLED: "true"
