@@ -1,0 +1,6 @@
+app:
+  storage:
+    local-dir: /tmp/ticketing-test-uploads
+    base-url: /test/uploads
+  scheduler:
+    expiry-delay-ms: 3600000  # 1 hour — won't fire during test runs
