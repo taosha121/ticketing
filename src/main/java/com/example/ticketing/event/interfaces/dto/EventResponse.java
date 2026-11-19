@@ -16,7 +16,7 @@ public record EventResponse(
         String status,
         String posterUrl,
         OffsetDateTime createdAt,
-        List<TicketInventoryResponse> ticketTypes
+        List<TicketInventoryResponse> ticketInventories
 ) {
     public static EventResponse from(Event event) {
         return new EventResponse(
@@ -30,7 +30,7 @@ public record EventResponse(
                 event.getStatus().name(),
                 event.getPosterUrl(),
                 event.getCreatedAt(),
-                event.getTicketTypes().stream().map(TicketInventoryResponse::from).toList()
+                event.getTicketInventories().stream().map(TicketInventoryResponse::from).toList()
         );
     }
 }
