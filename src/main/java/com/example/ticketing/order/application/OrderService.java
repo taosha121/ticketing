@@ -5,6 +5,7 @@ import com.example.ticketing.common.exception.ResourceNotFoundException;
 import com.example.ticketing.event.domain.TicketInventory;
 import com.example.ticketing.event.domain.TicketInventoryRepository;
 import com.example.ticketing.order.domain.Order;
+import com.example.ticketing.order.domain.OrderPlacedEvent;
 import com.example.ticketing.order.domain.OrderRepository;
 import com.example.ticketing.order.domain.Reservation;
 import com.example.ticketing.order.domain.ReservationRepository;
@@ -12,6 +13,7 @@ import com.example.ticketing.order.interfaces.dto.OrderResponse;
 import com.example.ticketing.order.interfaces.dto.PlaceOrderRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,15 +29,18 @@ public class OrderService {
     private final ReservationRepository reservationRepository;
     private final TicketInventoryRepository ticketInventoryRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public OrderService(OrderRepository orderRepository,
                         ReservationRepository reservationRepository,
                         TicketInventoryRepository ticketInventoryRepository,
-                        UserRepository userRepository) {
+                        UserRepository userRepository,
+                        ApplicationEventPublisher eventPublisher) {
         this.orderRepository = orderRepository;
         this.reservationRepository = reservationRepository;
         this.ticketInventoryRepository = ticketInventoryRepository;
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -66,6 +71,9 @@ public class OrderService {
                 order.getId(), userId, req.ticketInventoryId(),
                 req.quantity(), OffsetDateTime.now().plusMinutes(15));
         reservationRepository.save(reservation);
+
+        eventPublisher.publishEvent(
+                new OrderPlacedEvent(order.getId(), userId, userEmail, req.ticketInventoryId(), req.quantity()));
 
         return OrderResponse.from(order);
     }

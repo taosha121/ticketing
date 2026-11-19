@@ -9,6 +9,8 @@ import com.example.ticketing.event.domain.TicketInventory;
 import com.example.ticketing.event.interfaces.dto.CreateEventRequest;
 import com.example.ticketing.event.interfaces.dto.EventResponse;
 import com.example.ticketing.event.interfaces.dto.UpdateEventRequest;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -40,13 +42,14 @@ public class EventService {
         Event event = new Event(organizerId, req.title(), req.description(),
                 req.venue(), req.startsAt(), req.endsAt());
 
-        req.ticketTypes().forEach(tt ->
-                event.getTicketTypes().add(new TicketInventory(event, tt.name(), tt.price(), tt.totalQuantity()))
+        req.ticketInventories().forEach(tt ->
+                event.getTicketInventories().add(new TicketInventory(event, tt.name(), tt.price(), tt.totalQuantity()))
         );
 
         return EventResponse.from(eventRepository.save(event));
     }
 
+    @Cacheable(value = "events", key = "#id")
     @Transactional(readOnly = true)
     public EventResponse getById(Long id) {
         return eventRepository.findById(id)
@@ -60,6 +63,7 @@ public class EventService {
                 .map(EventResponse::from);
     }
 
+    @CacheEvict(value = "events", key = "#id")
     @Transactional
     public EventResponse update(String organizerEmail, Long id, UpdateEventRequest req) {
         Event event = findOwnEvent(organizerEmail, id);
@@ -67,6 +71,7 @@ public class EventService {
         return EventResponse.from(eventRepository.save(event));
     }
 
+    @CacheEvict(value = "events", key = "#id")
     @Transactional
     public EventResponse publish(String organizerEmail, Long id) {
         Event event = findOwnEvent(organizerEmail, id);
@@ -74,6 +79,7 @@ public class EventService {
         return EventResponse.from(eventRepository.save(event));
     }
 
+    @CacheEvict(value = "events", key = "#id")
     @Transactional
     public EventResponse cancel(String organizerEmail, Long id) {
         Event event = findOwnEvent(organizerEmail, id);
@@ -81,6 +87,7 @@ public class EventService {
         return EventResponse.from(eventRepository.save(event));
     }
 
+    @CacheEvict(value = "events", key = "#id")
     @Transactional
     public EventResponse uploadPoster(String organizerEmail, Long id, MultipartFile file) {
         Event event = findOwnEvent(organizerEmail, id);
