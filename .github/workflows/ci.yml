@@ -24,4 +24,5 @@ jobs:
         run: mvn test --no-transfer-progress
         env:
           DOCKER_HOST: unix:///var/run/docker.sock
+          DOCKER_API_VERSION: "1.41"
           TESTCONTAINERS_RYUK_DISABLED: "true"
